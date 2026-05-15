@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>View Order - C25 Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="backbtn.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Poppins;
+}
+
+body{
+  background:linear-gradient(135deg,#0d0d0d,#1a1a1a,#101010);
+  color:#fff;
+  padding:20px;
+  padding-top:120px;
+}
+
+/* HEADER */
+.header{
+  position:fixed;
+  top:14px;
+  left:14px;
+  width:calc(100% - 28px);
+  padding:14px 18px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.06);
+  backdrop-filter:blur(15px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+.header h2{
+  font-size:18px;
+}
+
+/* CARD */
+.card{
+  max-width:900px;
+  margin:auto;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:25px;
+  border-radius:25px;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  backdrop-filter:blur(15px);
+}
+
+/* USER INFO */
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.box{
+  background:rgba(255,255,255,0.05);
+  padding:12px;
+  border-radius:12px;
+}
+
+/* ITEMS */
+.item{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  background:rgba(255,255,255,0.05);
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+.item img{
+  width:55px;
+  height:55px;
+  border-radius:10px;
+  object-fit:cover;
+}
+
+/* STATUS */
+.status{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:12px;
+}
+
+.waiting{background:#ffb300;color:#000;}
+.accepted{background:#00c853;color:#000;}
+.rejected{background:#d50000;color:#fff;}
+
+/* TOTAL BOX */
+.totalBox{
+  margin-top:15px;
+  padding:15px;
+  border-radius:15px;
+  background:linear-gradient(135deg,#ff8c00,#ff6200);
+  font-weight:800;
+  text-align:center;
+}
+
+/* TITLE */
+h3{
+  margin-bottom:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h2>📦 Order Details</h2>
+  <span>C25 Admin Panel</span>
+</div>
+
+<div class="card">
+
+  <h3>Customer Info</h3>
+  <div class="info" id="info"></div>
+
+  <h3>Items</h3>
+  <div id="items"></div>
+
+  <div class="totalBox" id="total"></div>
+
+</div>
+
+<script>
+
+const supabaseClient = supabase.createClient(
+"https://sogyxzqvbquwrqlqpdaj.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZ3l4enF2YnF1d3JxbHFwZGFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTI0MjcsImV4cCI6MjA5NDE2ODQyN30.kubX_vDW8CiHJR7HLXs7-5RpeNI6DBlJLgt4uEhBEFE"
+);
+
+const id = new URLSearchParams(window.location.search).get("id");
+
+async function load(){
+
+  const { data } = await supabaseClient
+  .from("orders")
+  .select("*")
+  .eq("id",id)
+  .single();
+
+  /* STATUS CLASS */
+  let statusClass = "waiting";
+  if(data.status === "accepted") statusClass = "accepted";
+  if(data.status === "rejected") statusClass = "rejected";
+
+  /* INFO */
+  document.getElementById("info").innerHTML = `
+    <div class="box"><b>Name:</b><br>${data.name}</div>
+    <div class="box"><b>Phone:</b><br>${data.phone}</div>
+    <div class="box"><b>Email:</b><br>${data.email}</div>
+    <div class="box"><b>Location:</b><br>${data.location}</div>
+    <div class="box"><b>Pincode:</b><br>${data.pincode}</div>
+    <div class="box">
+      <b>Status:</b><br>
+      <span class="status ${statusClass}">
+        ${data.status || "waiting"}
+      </span>
+    </div>
+  `;
+
+  /* ITEMS FIX */
+  let itemsHTML = "";
+
+let itemsData = data.items;
+
+// agar items string me ho (Supabase kabhi kabhi string deta hai)
+if (typeof itemsData === "string") {
+  try {
+    itemsData = JSON.parse(itemsData);
+  } catch (e) {
+    itemsData = [];
+  }
+}
+
+if (Array.isArray(itemsData)) {
+
+  itemsData.forEach(i => {
+    itemsHTML += `
+      <div class="item">
+        <img src="${i.image || ''}">
+        <div>
+          <b>${i.name || 'No Name'}</b><br>
+          Qty: ${i.qty || 1} | ₹${i.price || 0}
+          <br>
+          <small>${i.description || ''}</small>
+        </div>
+      </div>
+    `;
+  });
+
+} else {
+  itemsHTML = `<pre>${JSON.stringify(itemsData, null, 2)}</pre>`;
+}
+
+document.getElementById("items").innerHTML = itemsHTML;
+
+  /* TOTAL */
+  document.getElementById("total").innerHTML = `
+    Subtotal: ₹${data.subtotal} | 
+    Delivery: ₹${data.delivery} <br><br>
+    GRAND TOTAL: ₹${data.total}
+  `;
+}
+
+load();
+
+</script>
+<script src="backbtn.js"></script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Products - C25 Admin</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="backbtn.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Poppins;
+  background:linear-gradient(135deg,#0d0d0d,#171717,#101010);
+  color:#fff;
+  padding:14px;
+  padding-top:160px;
+}
+
+.dashboard-header{
+  position:fixed;
+  top:14px;
+  left:14px;
+  width:calc(100% - 28px);
+  display:flex;
+  justify-content:space-between;
+  padding:14px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(10px);
+}
+
+.container{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+@media(max-width:900px){
+  .container{grid-template-columns:1fr;}
+}
+
+.product-list{
+  background:rgba(255,255,255,0.05);
+  padding:15px;
+  border-radius:20px;
+  max-height:75vh;
+  overflow:auto;
+}
+
+.item{
+  display:flex;
+  gap:10px;
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  cursor:pointer;
+}
+
+.item img{
+  width:60px;
+  height:60px;
+  border-radius:10px;
+  object-fit:cover;
+}
+
+.form{
+  background:rgba(255,255,255,0.05);
+  padding:20px;
+  border-radius:20px;
+}
+
+input,textarea{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:none;
+  background:rgba(255,255,255,0.08);
+  color:#fff;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,#ff8c00,#ff6200);
+  color:#fff;
+  font-weight:700;
+}
+
+img.preview{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-radius:14px;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header class="dashboard-header">
+  <h3>EDIT PRODUCTS</h3>
+</header>
+
+<div class="container">
+
+<!-- LEFT -->
+<div class="product-list" id="productList"></div>
+
+<!-- RIGHT -->
+<div class="form">
+
+<img id="preview" class="preview">
+
+<input type="file" id="image">
+
+<input type="text" id="title" placeholder="Title">
+<input type="text" id="category" placeholder="Category">
+<input type="number" id="price" placeholder="Price">
+
+<textarea id="description" placeholder="Description"></textarea>
+
+<input type="text" id="detail_link" placeholder="Detail Link">
+
+<input type="text" id="calories" placeholder="Calories">
+<input type="text" id="protein" placeholder="Protein">
+<input type="text" id="fat" placeholder="Fat">
+<input type="text" id="freshness" placeholder="Freshness">
+<input type="text" id="sugar" placeholder="Sugar">
+
+<button onclick="updateProduct()">UPDATE PRODUCT</button>
+
+</div>
+
+</div>
+
+<script>
+
+const supabaseClient = supabase.createClient(
+  "https://sogyxzqvbquwrqlqpdaj.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZ3l4enF2YnF1d3JxbHFwZGFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTI0MjcsImV4cCI6MjA5NDE2ODQyN30.kubX_vDW8CiHJR7HLXs7-5RpeNI6DBlJLgt4uEhBEFE"
+);
+
+function showToast(message, type = "success"){
+
+  const toast = document.getElementById("toast");
+
+  toast.className = "toast show " + type;
+
+  if(type === "success"){
+    toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${message}`;
+  } else {
+    toast.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${message}`;
+  }
+
+  setTimeout(()=>{
+    toast.classList.remove("show");
+  }, 2500);
+}
+
+
+let selectedId = null;
+let newImageFile = null;
+
+/* LOAD PRODUCTS */
+async function loadProducts(){
+  const { data } = await supabaseClient.from("products").select("*");
+
+  const list = document.getElementById("productList");
+  list.innerHTML = "";
+
+  data.forEach(p=>{
+    list.innerHTML += `
+      <div class="item" onclick='selectProduct(${JSON.stringify(p)})'>
+        <img src="${p.image}">
+        <div>
+          <b>${p.title}</b><br>
+          <small>${p.price}</small>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* SELECT PRODUCT */
+function selectProduct(p){
+
+  selectedId = p.id;
+
+  document.getElementById("title").value = p.title || "";
+  document.getElementById("category").value = p.category || "";
+  document.getElementById("price").value = p.price || "";
+  document.getElementById("description").value = p.description || "";
+  document.getElementById("detail_link").value = p.detail_link || "";
+
+  document.getElementById("calories").value = p.calories || "";
+  document.getElementById("protein").value = p.protein || "";
+  document.getElementById("fat").value = p.fat || "";
+  document.getElementById("freshness").value = p.freshness || "";
+  document.getElementById("sugar").value = p.sugar || "";
+
+  document.getElementById("preview").src = p.image || "";
+}
+/* IMAGE CHANGE */
+image.onchange = (e)=>{
+  newImageFile = e.target.files[0];
+  preview.src = URL.createObjectURL(newImageFile);
+};
+
+/* UPDATE */
+async function updateProduct(){
+
+  if(!selectedId){
+    alert("Select product first");
+    return;
+  }
+
+  let imageUrl = preview.src;
+
+  if(newImageFile){
+
+    const fileName = Date.now()+"_"+newImageFile.name;
+
+    const { error: uploadError } = await supabaseClient
+      .storage
+      .from("products")
+      .upload(fileName, newImageFile);
+
+    if(uploadError){
+      console.log(uploadError);
+      alert("Image upload failed");
+      return;
+    }
+
+    imageUrl = supabaseClient.storage
+      .from("products")
+      .getPublicUrl(fileName).data.publicUrl;
+  }
+
+  const { error } = await supabaseClient
+    .from("products")
+    .update({
+      title: document.getElementById("title").value,
+      category: document.getElementById("category").value,
+      price: document.getElementById("price").value,
+      description: document.getElementById("description").value,
+      detail_link: document.getElementById("detail_link").value,
+      calories: document.getElementById("calories").value,
+      protein: document.getElementById("protein").value,
+      fat: document.getElementById("fat").value,
+      freshness: document.getElementById("freshness").value,
+      sugar: document.getElementById("sugar").value,
+      image: imageUrl
+    })
+    .eq("id", selectedId);
+
+  if(error){
+    console.log(error);
+    alert("Update Failed");
+    return;
+  }
+
+  alert("Product Updated Successfully");
+  loadProducts();
+}
+
+loadProducts();
+
+
+  
+</script>
+<script src="backbtn.js"></script>
+</body>
+</html>

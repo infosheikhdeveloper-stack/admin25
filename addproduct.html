@@ -1,0 +1,652 @@
+<!DOCTYPE html>              <html lang="en">              
+<head>              
+<meta charset="UTF-8">              
+<meta name="viewport"              
+content="width=device-width, initial-scale=1.0">              <title>Add Products - C25 Admin</title>              <link rel="stylesheet"              
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">              <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"              
+rel="stylesheet">          
+<link rel="stylesheet" href="backbtn.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>              <style>              
+              
+*{              
+  margin:0;              
+  padding:0;              
+  box-sizing:border-box;              
+  font-family:'Poppins',sans-serif;              
+}              
+              
+body{              
+  background:              
+  linear-gradient(135deg,#0d0d0d,#171717,#101010);              
+              
+  min-height:100vh;              
+              
+  padding:14px;              
+  padding-top:165px;              
+              
+  color:#fff;              
+  overflow-x:hidden;              
+}              
+              
+/* =========================              
+BACKGROUND              
+========================= */              
+              
+body::before{              
+  content:"";              
+  position:fixed;              
+              
+  width:320px;              
+  height:320px;              
+              
+  background:rgba(255,140,0,0.16);              
+              
+  border-radius:50%;              
+  filter:blur(120px);              
+              
+  top:-120px;              
+  left:-80px;              
+              
+  z-index:-1;              
+}              
+              
+body::after{              
+  content:"";              
+  position:fixed;              
+              
+  width:260px;              
+  height:260px;              
+              
+  background:rgba(255,140,0,0.10);              
+              
+  border-radius:50%;              
+  filter:blur(100px);              
+              
+  bottom:-100px;              
+  right:-70px;              
+              
+  z-index:-1;              
+}              
+              
+/* =========================              
+HEADER              
+========================= */              
+              
+.dashboard-header{              
+              
+  width:calc(100% - 28px);              
+              
+  padding:14px 16px;              
+              
+  border-radius:24px;              
+              
+  background:              
+  linear-gradient(145deg,              
+  rgba(255,255,255,0.08),              
+  rgba(255,255,255,0.03));              
+              
+  backdrop-filter:blur(14px);              
+              
+  border:1px solid rgba(255,255,255,0.07);              
+              
+  display:flex;              
+  justify-content:space-between;              
+  align-items:center;              
+              
+  box-shadow:              
+  0 15px 40px rgba(0,0,0,0.35);              
+              
+  position:fixed;              
+              
+  top:14px;              
+  left:14px;              
+              
+  z-index:999;              
+}              
+              
+.logo-side{              
+  display:flex;              
+  align-items:center;              
+  gap:12px;              
+}              
+              
+.logo{              
+  width:58px;              
+  height:58px;              
+              
+  border-radius:18px;              
+  object-fit:cover;              
+              
+  box-shadow:              
+  0 10px 25px rgba(255,140,0,0.35);              
+}              
+              
+.logo-side h2{              
+  font-size:18px;              
+  font-weight:800;              
+}              
+              
+.logo-side p{              
+  font-size:11px;              
+  color:#ffb347;              
+  margin-top:3px;              
+}              
+              
+.admin-tag{              
+              
+  padding:10px 14px;              
+              
+  border-radius:14px;              
+              
+  background:              
+  linear-gradient(135deg,#ff8c00,#ff6200);              
+              
+  font-size:11px;              
+  font-weight:700;              
+              
+  display:flex;              
+  align-items:center;              
+  gap:8px;              
+              
+  box-shadow:              
+  0 10px 25px rgba(255,140,0,0.35);              
+}              
+              
+/* =========================              
+TITLE              
+========================= */              
+              
+.page-title{              
+  margin-bottom:20px;              
+}              
+              
+.page-title h1{              
+  font-size:28px;              
+  font-weight:800;              
+}              
+              
+.page-title p{              
+  margin-top:5px;              
+  color:#cfcfcf;              
+  font-size:13px;              
+}              
+              
+/* =========================              
+FORM              
+========================= */              
+              
+.form-box{              
+              
+  background:              
+  linear-gradient(145deg,              
+  rgba(255,255,255,0.07),              
+  rgba(255,255,255,0.03));              
+              
+  border:1px solid rgba(255,255,255,0.06);              
+              
+  border-radius:28px;              
+              
+  padding:20px;              
+              
+  box-shadow:              
+  0 18px 40px rgba(0,0,0,0.30);              
+}              
+              
+.input-box{              
+  margin-bottom:18px;              
+}              
+              
+.input-box label{              
+  display:block;              
+              
+  margin-bottom:8px;              
+              
+  font-size:14px;              
+  font-weight:600;              
+              
+  color:#ffb347;              
+}              
+              
+.input-box input,              
+.input-box textarea{              
+              
+  width:100%;              
+              
+  border:none;              
+  outline:none;              
+              
+  background:              
+  rgba(255,255,255,0.05);              
+              
+  padding:14px;              
+              
+  border-radius:16px;              
+              
+  color:#fff;              
+              
+  font-size:14px;              
+              
+  border:1px solid rgba(255,255,255,0.06);              
+}              
+              
+.input-box textarea{              
+  resize:none;              
+  height:110px;              
+}              
+              
+.input-box input[type="file"]{              
+  padding:12px;              
+}              
+              
+.row{              
+  display:grid;              
+  grid-template-columns:1fr 1fr;              
+  gap:14px;              
+}              
+              
+.upload-preview{              
+  width:100%;              
+  height:220px;              
+              
+  border-radius:24px;              
+              
+  overflow:hidden;              
+              
+  margin-top:10px;              
+              
+  border:2px dashed rgba(255,255,255,0.12);              
+              
+  display:flex;              
+  align-items:center;              
+  justify-content:center;              
+              
+  background:              
+  rgba(255,255,255,0.03);              
+}              
+              
+.upload-preview img{              
+  width:100%;              
+  height:100%;              
+  object-fit:cover;              
+}              
+              
+.upload-preview span{              
+  color:#aaa;              
+  font-size:14px;              
+}              
+              
+/* =========================              
+BUTTON              
+========================= */              
+              
+.submit-btn{              
+              
+  width:100%;              
+              
+  border:none;              
+  outline:none;              
+              
+  padding:16px;              
+              
+  border-radius:18px;              
+              
+  background:              
+  linear-gradient(135deg,#ff8c00,#ff6200);              
+              
+  color:#fff;              
+              
+  font-size:15px;              
+  font-weight:700;              
+              
+  cursor:pointer;              
+              
+  box-shadow:              
+  0 15px 35px rgba(255,140,0,0.35);              
+              
+  transition:0.3s;              
+}              
+              
+.submit-btn:hover{              
+  transform:translateY(-3px);              
+}              
+              
+.success-box{              
+              
+  margin-top:18px;              
+              
+  background:              
+  rgba(0,255,120,0.12);              
+              
+  border:1px solid rgba(0,255,120,0.2);              
+              
+  padding:14px;              
+              
+  border-radius:16px;              
+              
+  color:#8dffb5;              
+              
+  display:none;              
+}              
+              
+.error-box{              
+              
+  margin-top:18px;              
+              
+  background:              
+  rgba(255,0,0,0.12);              
+              
+  border:1px solid rgba(255,0,0,0.2);              
+              
+  padding:14px;              
+              
+  border-radius:16px;              
+              
+  color:#ffb1b1;              
+              
+  display:none;              
+}              
+              
+/* =========================              
+MOBILE              
+========================= */              
+              
+@media(max-width:768px){              
+              
+  .row{              
+    grid-template-columns:1fr;              
+  }              
+              
+}              
+              
+</style>              </head>              
+<body>              <!-- HEADER -->              <header class="dashboard-header">                <div class="logo-side">              <img src="logo.png" class="logo">              
+          
+<div>              
+  <h2>C25 Cafe & Bakery</h2>              
+  <p>Premium Admin Dashboard</p>              
+</div>
+
+  </div>                <div class="admin-tag">              
+    <i class="fa-solid fa-plus"></i>              
+    ADD PRODUCT              
+  </div>              </header>              <!-- TITLE -->              <section class="page-title">                <h1>Add Product</h1>                <p>              
+    Upload new cafe & bakery products              
+  </p>              </section>              <!-- FORM -->              <div class="form-box">                <form id="productForm">              <div class="input-box">              
+  <label>Category</label>              
+  <input type="text"              
+  id="category"              
+  placeholder="Burger, Pizza, Cake..."              
+  required>              
+</div>              
+          
+<div class="input-box">              
+  <label>Product Title</label>              
+  <input type="text"              
+  id="title"              
+  placeholder="Product title..."              
+  required>              
+</div>              
+          
+<div class="input-box">              
+  <label>Description</label>              
+  <textarea              
+  id="description"              
+  placeholder="Write product description..."              
+  required></textarea>              
+</div>              
+          
+<div class="row">              
+          
+  <div class="input-box">              
+    <label>Price</label>              
+    <input type="number"              
+    id="price"              
+    placeholder="299"              
+    required>              
+  </div>              
+          
+  <div class="input-box">              
+    <label>Detail Link</label>              
+    <input type="text"              
+    id="detail_link"              
+    placeholder="detailbakery.html">              
+  </div>              
+          
+</div>              
+          
+<!-- NUTRITIONS -->              
+          
+<div class="row">              
+          
+  <div class="input-box">              
+    <label>Calories</label>              
+    <input type="text"              
+    id="calories"              
+    placeholder="250 Cal">              
+  </div>              
+          
+  <div class="input-box">              
+    <label>Protein</label>              
+    <input type="text"              
+    id="protein"              
+    placeholder="15g">              
+  </div>              
+          
+</div>              
+          
+<div class="row">              
+          
+  <div class="input-box">              
+    <label>Fat</label>              
+    <input type="text"              
+    id="fat"              
+    placeholder="12g">              
+  </div>              
+          
+  <div class="input-box">              
+    <label>Freshness</label>              
+    <input type="text"              
+    id="freshness"              
+    placeholder="100% Fresh">              
+  </div>              
+          
+</div>              
+          
+<div class="input-box">              
+  <label>Sugar</label>              
+  <input type="text"              
+  id="sugar"              
+  placeholder="20g">              
+</div>              
+          
+<!-- IMAGE -->              
+          
+<div class="input-box">              
+          
+  <label>Upload Product Image</label>              
+          
+  <input type="file"              
+  id="imageFile"              
+  accept="image/*"              
+  required>              
+          
+  <div class="upload-preview"              
+  id="previewBox">              
+          
+    <span>Select Image</span>              
+          
+  </div>              
+          
+</div>              
+          
+<!-- BUTTON -->              
+          
+<button type="submit"              
+class="submit-btn">              
+          
+  <i class="fa-solid fa-cloud-arrow-up"></i>              
+  Upload Product              
+          
+</button>              
+          
+<div class="success-box"              
+id="successBox">              
+  Product added successfully!              
+</div>              
+          
+<div class="error-box"              
+id="errorBox">              
+  Error uploading product!              
+</div>
+
+  </form>       
+  </div>           
+<script>
+/* =========================
+SUPABASE
+========================= */
+
+const supabaseClient = supabase.createClient(
+  "https://sogyxzqvbquwrqlqpdaj.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZ3l4enF2YnF1d3JxbHFwZGFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTI0MjcsImV4cCI6MjA5NDE2ODQyN30.kubX_vDW8CiHJR7HLXs7-5RpeNI6DBlJLgt4uEhBEFE"
+);
+
+
+/* =========================
+TOAST NOTIFICATION (TOP ALERT)
+========================= */
+
+function showToast(message, type = "success") {
+  let toast = document.getElementById("toast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    document.body.appendChild(toast);
+
+    toast.style.position = "fixed";
+    toast.style.top = "20px";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.padding = "14px 20px";
+    toast.style.borderRadius = "14px";
+    toast.style.fontSize = "14px";
+    toast.style.fontWeight = "600";
+    toast.style.zIndex = "99999";
+    toast.style.backdropFilter = "blur(10px)";
+    toast.style.transition = "0.3s";
+  }
+
+  toast.innerText = message;
+
+  if (type === "success") {
+    toast.style.background = "rgba(0,255,120,0.15)";
+    toast.style.color = "#8dffb5";
+    toast.style.border = "1px solid rgba(0,255,120,0.3)";
+  } else {
+    toast.style.background = "rgba(255,0,0,0.15)";
+    toast.style.color = "#ffb1b1";
+    toast.style.border = "1px solid rgba(255,0,0,0.3)";
+  }
+
+  toast.style.opacity = "1";
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 2500);
+}
+
+/* =========================
+IMAGE PREVIEW
+========================= */
+
+const imageInput = document.getElementById("imageFile");
+const previewBox = document.getElementById("previewBox");
+
+imageInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function (event) {
+    previewBox.innerHTML = `<img src="${event.target.result}">`;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+/* =========================
+ADD PRODUCT
+========================= */
+
+document
+  .getElementById("productForm")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    try {
+      const imageFile = document.getElementById("imageFile").files[0];
+
+      if (!imageFile) {
+        showToast("Please select image!", "error");
+        return;
+      }
+
+      const fileName = Date.now() + "_" + imageFile.name;
+
+      /* UPLOAD IMAGE */
+      const { error: uploadError } = await supabaseClient.storage
+        .from("products")
+        .upload(fileName, imageFile);
+
+      if (uploadError) throw uploadError;
+
+      /* GET IMAGE URL */
+      const imageUrl = supabaseClient.storage
+        .from("products")
+        .getPublicUrl(fileName).data.publicUrl;
+
+      /* INSERT PRODUCT */
+      const { data, error } = await supabaseClient
+  .from("products")
+  .insert([{
+    category: document.getElementById("category").value,
+    title: document.getElementById("title").value,
+    description: document.getElementById("description").value,
+    price: document.getElementById("price").value,
+    image: imageUrl,
+    detail_link: document.getElementById("detail_link").value,
+    calories: document.getElementById("calories").value,
+    protein: document.getElementById("protein").value,
+    fat: document.getElementById("fat").value,
+    freshness: document.getElementById("freshness").value,
+    sugar: document.getElementById("sugar").value
+  }])
+  .select();
+
+if (error) {
+  console.log("SUPABASE ERROR:", error);
+  showToast(error.message, "error");
+  return;
+}
+
+console.log("INSERTED DATA:", data);
+
+      if (error) throw error;
+
+      showToast("Product added successfully!", "success");
+
+      document.getElementById("productForm").reset();
+      previewBox.innerHTML = `<span>Select Image</span>`;
+
+    } catch (err) {
+      console.log(err);
+      showToast("Error uploading product!", "error");
+    }
+  });
+  
+</script>
+<script src="backbtn.js"></script>
+</body>              
+</html>              

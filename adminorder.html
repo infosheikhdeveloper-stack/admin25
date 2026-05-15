@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Orders - C25</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="backbtn.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Poppins;
+}
+
+body{
+  background:linear-gradient(135deg,#0d0d0d,#171717,#101010);
+  color:#fff;
+  padding:20px;
+  padding-top:140px;
+}
+
+/* ================= HEADER (SAME AS DASHBOARD) ================= */
+
+.dashboard-header{
+  width:calc(100% - 40px);
+  padding:18px 20px;
+  border-radius:28px;
+
+  background:linear-gradient(
+    145deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.03)
+  );
+
+  backdrop-filter:blur(12px);
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  box-shadow:0 15px 40px rgba(0,0,0,0.4);
+
+  position:fixed;
+  top:20px;
+  left:20px;
+  z-index:999;
+}
+
+/* LOGO SIDE */
+.logo-side{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.logo-side img{
+  width:60px;
+  height:60px;
+  border-radius:18px;
+  object-fit:cover;
+  box-shadow:0 10px 25px rgba(255,140,0,0.35);
+}
+
+.logo-side h3{
+  font-size:20px;
+  font-weight:800;
+}
+
+.logo-side small{
+  font-size:13px;
+  color:#ffb347;
+}
+
+/* TAG */
+.tag{
+  padding:10px 16px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#ff8c00,#ff6200);
+  font-size:13px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  box-shadow:0 10px 25px rgba(255,140,0,0.35);
+}
+
+/* MOBILE HEADER FIX */
+@media(max-width:600px){
+  .dashboard-header{
+    flex-direction:column;
+    gap:10px;
+    align-items:flex-start;
+    width:calc(100% - 20px);
+    left:10px;
+    top:10px;
+  }
+
+  body{
+    padding-top:170px;
+  }
+}
+
+/* ================= CARD ================= */
+
+.card{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+
+  padding:15px;
+  border-radius:18px;
+
+  margin-bottom:12px;
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+
+  transition:0.25s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+}
+
+/* TOP */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.sno{
+  font-size:12px;
+  color:#ffb347;
+}
+
+/* STATUS */
+.status{
+  padding:5px 10px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.waiting{background:#ffb300;color:#000;}
+.accepted{background:#00c853;color:#000;}
+.rejected{background:#d50000;color:#fff;}
+
+/* BUTTONS */
+.btn{
+  padding:8px 10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+  margin-right:6px;
+  font-size:12px;
+}
+
+.view{background:#ff8c00;color:#fff;}
+.accept{background:#00c853;color:#fff;}
+.reject{background:#d50000;color:#fff;}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="dashboard-header">
+
+  <div class="logo-side">
+    <img src="logo.png">
+    <div>
+      <h3>C25 Admin</h3>
+      <small>Orders Panel</small>
+    </div>
+  </div>
+
+  <div class="tag">
+    <i class="fa-solid fa-box"></i>
+    ORDERS
+  </div>
+
+</div>
+
+<!-- ORDERS -->
+<div id="orders"></div>
+
+<script>
+
+const supabaseClient = supabase.createClient(
+"https://sogyxzqvbquwrqlqpdaj.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZ3l4enF2YnF1d3JxbHFwZGFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTI0MjcsImV4cCI6MjA5NDE2ODQyN30.kubX_vDW8CiHJR7HLXs7-5RpeNI6DBlJLgt4uEhBEFE"
+);
+
+/* LOAD ORDERS */
+async function loadOrders(){
+
+  const { data } = await supabaseClient
+    .from("orders")
+    .select("*");
+
+  const box = document.getElementById("orders");
+  box.innerHTML = "";
+
+  data.forEach((o,index)=>{
+
+    let statusClass = "waiting";
+    if(o.status === "accepted") statusClass = "accepted";
+    if(o.status === "rejected") statusClass = "rejected";
+
+    box.innerHTML += `
+      <div class="card">
+
+        <div class="top">
+          <div class="sno">S# ${index+1}</div>
+          <div class="status ${statusClass}">
+            ${o.status || "waiting"}
+          </div>
+        </div>
+
+        <b>${o.name || "No Name"}</b><br>
+        📞 ${o.phone || "-"} | ✉ ${o.email || "-"}<br>
+        💰 Total: ₹${o.total || 0}<br><br>
+
+        <button class="btn view" onclick="viewOrder('${o.id}')">
+          <i class="fa fa-eye"></i> View
+        </button>
+
+        <button class="btn accept" onclick="updateStatus('${o.id}','accepted')">
+          <i class="fa fa-check"></i>
+        </button>
+
+        <button class="btn reject" onclick="updateStatus('${o.id}','rejected')">
+          <i class="fa fa-xmark"></i>
+        </button>
+
+      </div>
+    `;
+  });
+}
+
+/* VIEW */
+function viewOrder(id){
+  window.location.href = "vieworder.html?id=" + id;
+}
+
+/* STATUS UPDATE */
+async function updateStatus(id,status){
+
+  await supabaseClient
+    .from("orders")
+    .update({ status })
+    .eq("id",id);
+
+  loadOrders();
+}
+
+loadOrders();
+
+</script>
+<script src="adminback.js"></script>
+<script src="backbtn.js"></script>
+</body>
+</html>

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>C25 Admin Dashboard</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:
+  linear-gradient(135deg,#0f0f0f,#1a1a1a,#111);
+  min-height:100vh;
+  padding:20px;
+  color:#fff;
+  overflow-x:hidden;
+}
+
+/* =========================
+BACKGROUND GLOW
+========================= */
+
+body::before{
+  content:"";
+  position:fixed;
+  width:350px;
+  height:350px;
+  background:rgba(255,140,0,0.25);
+  border-radius:50%;
+  filter:blur(120px);
+  top:-120px;
+  left:-80px;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  width:300px;
+  height:300px;
+  background:rgba(255,140,0,0.15);
+  border-radius:50%;
+  filter:blur(100px);
+  bottom:-120px;
+  right:-80px;
+}
+
+/* =========================
+HEADER FIXED TOP
+========================= */
+
+.dashboard-header{
+  width:calc(100% - 40px);
+  padding:18px 20px;
+  border-radius:28px;
+
+  background:
+  linear-gradient(145deg,
+  rgba(255,255,255,0.08),
+  rgba(255,255,255,0.03));
+
+  backdrop-filter:blur(12px);
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  box-shadow:
+  0 15px 40px rgba(0,0,0,0.4);
+
+  position:fixed;
+  top:20px;
+  left:20px;
+
+  z-index:999;
+}
+
+/* BODY TOP SPACE */
+body{
+  padding-top:140px;
+}
+
+/* LOGO SIDE */
+.logo-side{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.logo{
+  width:70px;
+  height:70px;
+  border-radius:22px;
+  object-fit:cover;
+
+  box-shadow:
+  0 10px 25px rgba(255,140,0,0.35);
+}
+
+.logo-side h2{
+  font-size:24px;
+  font-weight:800;
+}
+
+.logo-side p{
+  font-size:13px;
+  margin-top:4px;
+  color:#ffb347;
+}
+
+/* ADMIN TAG */
+.admin-tag{
+  padding:12px 18px;
+  border-radius:16px;
+
+  background:
+  linear-gradient(135deg,#ff8c00,#ff6200);
+
+  font-size:13px;
+  font-weight:700;
+
+  box-shadow:
+  0 10px 25px rgba(255,140,0,0.35);
+}
+
+/* MOBILE */
+@media(max-width:480px){
+
+  .dashboard-header{
+    width:calc(100% - 20px);
+    left:10px;
+    top:10px;
+    padding:15px;
+    border-radius:24px;
+
+    flex-direction:column;
+    align-items:flex-start;
+    gap:15px;
+  }
+
+  body{
+    padding-top:170px;
+  }
+
+  .logo{
+    width:60px;
+    height:60px;
+  }
+
+  .logo-side h2{
+    font-size:20px;
+  }
+
+}
+
+/* =========================
+WELCOME CARD
+========================= */
+
+.welcome-card{
+  margin-top:25px;
+  padding:30px;
+  border-radius:32px;
+
+  background:
+  linear-gradient(145deg,
+  rgba(255,140,0,0.18),
+  rgba(255,255,255,0.04));
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+  0 20px 45px rgba(0,0,0,0.4);
+
+  position:relative;
+  overflow:hidden;
+}
+
+.welcome-card::before{
+  content:"";
+  position:absolute;
+  width:220px;
+  height:220px;
+  background:rgba(255,255,255,0.06);
+  border-radius:50%;
+  top:-80px;
+  right:-80px;
+}
+
+.welcome-card h1{
+  font-size:34px;
+  font-weight:800;
+}
+
+.welcome-card p{
+  margin-top:10px;
+  color:#d6d6d6;
+  line-height:1.7;
+}
+
+/* =========================
+STATS
+========================= */
+
+.stats-grid{
+  margin-top:28px;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.stat-card{
+  padding:22px;
+  border-radius:28px;
+
+  background:
+  linear-gradient(145deg,
+  rgba(255,255,255,0.07),
+  rgba(255,255,255,0.03));
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+  0 15px 35px rgba(0,0,0,0.35);
+
+  position:relative;
+  overflow:hidden;
+
+  transition:0.35s;
+}
+
+.stat-card:hover{
+  transform:
+  translateY(-8px)
+  scale(1.02);
+}
+
+.stat-card i{
+  font-size:34px;
+  color:#ff9800;
+
+  margin-bottom:16px;
+
+  text-shadow:
+  0 0 20px rgba(255,140,0,0.45);
+}
+
+.stat-card h2{
+  font-size:32px;
+  font-weight:800;
+}
+
+.stat-card span{
+  font-size:14px;
+  color:#cfcfcf;
+}
+
+/* =========================
+MENU GRID
+========================= */
+
+.menu-grid{
+  margin-top:30px;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.menu-card{
+  text-decoration:none;
+  color:#fff;
+
+  padding:26px 20px;
+
+  border-radius:30px;
+
+  background:
+  linear-gradient(145deg,
+  rgba(255,255,255,0.08),
+  rgba(255,255,255,0.03));
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+  0 18px 40px rgba(0,0,0,0.35);
+
+  transition:0.35s;
+
+  position:relative;
+  overflow:hidden;
+}
+
+.menu-card::before{
+  content:"";
+  position:absolute;
+  width:140px;
+  height:140px;
+  background:rgba(255,140,0,0.12);
+  border-radius:50%;
+  top:-40px;
+  right:-40px;
+}
+
+.menu-card:hover{
+  transform:
+  translateY(-10px)
+  scale(1.03);
+}
+
+.menu-card i{
+  font-size:38px;
+  color:#ff9800;
+
+  margin-bottom:18px;
+
+  text-shadow:
+  0 0 20px rgba(255,140,0,0.45);
+}
+
+.menu-card h3{
+  font-size:20px;
+  font-weight:700;
+}
+
+.menu-card p{
+  margin-top:8px;
+  font-size:13px;
+  color:#d6d6d6;
+}
+
+/* =========================
+BOTTOM
+========================= */
+
+.bottom-text{
+  margin-top:35px;
+  text-align:center;
+  color:#aaa;
+  font-size:13px;
+}
+
+/* =========================
+MOBILE
+========================= */
+
+@media(max-width:480px){
+
+  .dashboard-header{
+    flex-direction:column;
+    gap:15px;
+    align-items:flex-start;
+  }
+
+  .logo-side h2{
+    font-size:20px;
+  }
+
+  .welcome-card h1{
+    font-size:28px;
+  }
+
+}
+
+/* =========================
+INSTALL POPUP 3D (ADMIN)
+========================= */
+
+.install-popup{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%) scale(0.9);
+  width:90%;
+  max-width:360px;
+
+  background:rgba(20,20,20,0.9);
+  backdrop-filter:blur(15px);
+
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:22px;
+
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+
+  padding:16px;
+
+  opacity:0;
+  transition:0.3s ease;
+  z-index:99999;
+}
+
+.install-popup.show{
+  opacity:1;
+  transform:translateX(-50%) scale(1);
+}
+
+/* HEADER */
+.install-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.install-header img{
+  width:45px;
+  height:45px;
+  border-radius:14px;
+  box-shadow:0 10px 20px rgba(255,140,0,0.3);
+}
+
+.install-header h3{
+  font-size:16px;
+}
+
+.install-header p{
+  font-size:12px;
+  color:#ffb347;
+}
+
+/* BODY */
+.install-body p{
+  font-size:13px;
+  color:#ddd;
+  margin-bottom:14px;
+  line-height:1.4;
+}
+
+/* BUTTONS */
+.install-actions{
+  display:flex;
+  gap:10px;
+}
+
+.install-actions button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+#installBtn{
+  background:linear-gradient(135deg,#ff8c00,#ff6200);
+  color:#fff;
+  box-shadow:0 10px 20px rgba(255,140,0,0.3);
+}
+
+#closeBtn{
+  background:rgba(255,255,255,0.08);
+  color:#fff;
+}
+
+</style>
+</head>
+<body>
+
+<!-- =========================
+HEADER
+========================= -->
+
+<header class="dashboard-header">
+
+  <div class="logo-side">
+
+    <img src="logo.png" class="logo">
+
+    <div>
+      <h2>C25 Cafe & Bakery</h2>
+      <p>Premium Admin Dashboard</p>
+    </div>
+
+  </div>
+
+  <div class="admin-tag">
+    <i class="fa-solid fa-shield-halved"></i>
+    ADMIN PANEL
+  </div>
+
+</header>
+
+<!-- =========================
+WELCOME
+========================= -->
+
+<section class="welcome-card">
+
+  <h1>Welcome Admin 👋</h1>
+
+  <p>
+    Manage your cafe products, orders,
+    customers and business analytics
+    with premium dashboard controls.
+  </p>
+
+</section>
+
+<!-- =========================
+REPLACE OLD STATS SECTION
+WITH THIS
+========================= -->
+
+<section class="stats-grid">
+
+  <a href="users.html" class="stat-card" style="text-decoration:none;color:#fff;">
+
+    <i class="fa-solid fa-users"></i>
+
+    <h2 id="usersCount">0</h2>
+
+    <span>Total Users</span>
+
+  </a>
+
+  <a href="adminorder.html" class="stat-card" style="text-decoration:none;color:#fff;">
+
+    <i class="fa-solid fa-cart-shopping"></i>
+
+    <h2 id="ordersCount">0</h2>
+
+    <span>Total Orders</span>
+
+  </a>
+
+  <a href="products.html" class="stat-card" style="text-decoration:none;color:#fff;">
+
+    <i class="fa-solid fa-box-open"></i>
+
+    <h2 id="productsCount">0</h2>
+
+    <span>Total Products</span>
+
+  </a>
+
+  <a href="#" class="stat-card" style="text-decoration:none;color:#fff;">
+
+    <i class="fa-solid fa-indian-rupee-sign"></i>
+
+    <h2 id="profitCount">₹0</h2>
+
+    <span>Total Profit</span>
+
+  </a>
+
+</section>
+
+<!-- =========================
+MENU
+========================= -->
+
+<section class="menu-grid">
+
+  <!-- USERS -->
+  <a href="users.html" class="menu-card">
+
+    <i class="fa-solid fa-users"></i>
+
+    <h3>Users</h3>
+
+    <p>
+      View all app users & customer data
+    </p>
+
+  </a>
+
+  <!-- ORDERS -->
+  <a href="adminorder.html" class="menu-card">
+
+    <i class="fa-solid fa-bag-shopping"></i>
+
+    <h3>View Orders</h3>
+
+    <p>
+      Check all customer orders instantly
+    </p>
+
+  </a>
+
+  <!-- ADD PRODUCT -->
+  <a href="addproduct.html" class="menu-card">
+
+    <i class="fa-solid fa-square-plus"></i>
+
+    <h3>Add Product</h3>
+
+    <p>
+      Upload new cafe food products
+    </p>
+
+  </a>
+
+  <!-- EDIT PRODUCT -->
+  <a href="editproduct.html" class="menu-card">
+
+    <i class="fa-solid fa-pen-to-square"></i>
+
+    <h3>Edit Products</h3>
+
+    <p>
+      Update prices, images & details
+    </p>
+
+  </a>
+
+</section>
+
+<!-- =========================
+BOTTOM TEXT
+========================= -->
+
+<div class="bottom-text">
+  © 2026 C25 Cafe & Bakery • Premium 3D Dashboard
+</div>
+<!-- =========================
+SUPABASE CDN
+PASTE BEFORE </body>
+========================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const supabaseClient = supabase.createClient(
+  "https://sogyxzqvbquwrqlqpdaj.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZ3l4enF2YnF1d3JxbHFwZGFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTI0MjcsImV4cCI6MjA5NDE2ODQyN30.kubX_vDW8CiHJR7HLXs7-5RpeNI6DBlJLgt4uEhBEFE"
+);
+
+
+
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // delay popup
+  setTimeout(() => {
+    showInstallPopup();
+  }, 5000);
+});
+
+function showInstallPopup() {
+
+  // avoid duplicate popup
+  if(document.querySelector(".install-popup")) return;
+
+  const wrapper = document.createElement("div");
+
+  wrapper.innerHTML = `
+    <div class="install-popup">
+
+      <div class="install-header">
+        <img src="logo.png">
+        <div>
+          <h3>C25 Admin</h3>
+          <p>Admin Panel PWA</p>
+        </div>
+      </div>
+
+      <div class="install-body">
+        <p>Install admin panel for faster order management 🚀</p>
+      </div>
+
+      <div class="install-actions">
+        <button id="installBtn">Install</button>
+        <button id="closeBtn">Later</button>
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(wrapper);
+
+  setTimeout(() => {
+    document.querySelector(".install-popup").classList.add("show");
+  }, 50);
+
+  document.getElementById("installBtn").onclick = async () => {
+
+    wrapper.remove();
+
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+    }
+  };
+
+  document.getElementById("closeBtn").onclick = () => {
+    wrapper.remove();
+  };
+}
+/* =========================
+LOAD DASHBOARD DATA
+========================= */
+
+async function loadDashboardData(){
+
+  try{
+
+    /* =========================
+    TOTAL USERS
+    ========================= */
+
+    const {
+      count: usersCount
+    } = await supabaseClient
+    .from("users")
+    .select("*", {
+      count: "exact",
+      head: true
+    });
+
+
+    /* =========================
+    TOTAL ORDERS
+    ========================= */
+
+    const {
+      count: ordersCount
+    } = await supabaseClient
+    .from("orders")
+    .select("*", {
+      count: "exact",
+      head: true
+    });
+
+
+    /* =========================
+    TOTAL PRODUCTS
+    ========================= */
+
+    const {
+      count: productsCount
+    } = await supabaseClient
+    .from("products")
+    .select("*", {
+      count: "exact",
+      head: true
+    });
+
+
+    /* =========================
+    TOTAL PROFIT
+    ========================= */
+
+    const {
+      data: ordersData
+    } = await supabaseClient
+    .from("orders")
+    .select("total");
+
+
+    let totalProfit = 0;
+
+    if(ordersData){
+
+      ordersData.forEach(order => {
+
+        totalProfit += Number(order.total || 0);
+
+      });
+
+    }
+
+
+    /* =========================
+    UPDATE HTML
+    ========================= */
+
+    document.getElementById("usersCount")
+    .innerText = usersCount || 0;
+
+    document.getElementById("ordersCount")
+    .innerText = ordersCount || 0;
+
+    document.getElementById("productsCount")
+    .innerText = productsCount || 0;
+
+    document.getElementById("profitCount")
+    .innerText = "₹" + totalProfit;
+
+  }
+
+  catch(error){
+
+    console.log(error);
+
+  }
+
+}
+
+loadDashboardData();
+
+</script>
+<script src="adminback.js"></script>
+
+
+</body>
+</html>
