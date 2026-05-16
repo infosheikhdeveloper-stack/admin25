@@ -161,12 +161,66 @@ body::after{
   color:#fff;
   cursor:pointer;
 }
+/* =========================
+TOAST NOTIFICATION
+========================= */
+
+.toast{
+  position:fixed;
+  top:-120px;
+  left:50%;
+  transform:translateX(-50%);
+
+  min-width:280px;
+  max-width:90%;
+
+  padding:14px 18px;
+
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  font-size:14px;
+  font-weight:600;
+
+  backdrop-filter:blur(14px);
+
+  z-index:99999;
+
+  transition:0.4s ease;
+
+  box-shadow:0 15px 40px rgba(0,0,0,0.35);
+}
+
+.toast i{
+  font-size:18px;
+}
+
+.toast.show{
+  top:20px;
+}
+
+.toast.success{
+  background:rgba(0,255,120,0.15);
+  border:1px solid rgba(0,255,120,0.25);
+  color:#8dffb5;
+}
+
+.toast.error{
+  background:rgba(255,0,0,0.15);
+  border:1px solid rgba(255,0,0,0.25);
+  color:#ffb1b1;
+}
+
 
 </style>
 </head>
 
 <body>
-
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
 <!-- HEADER -->
 <header class="dashboard-header">
   <div class="logo-side">
@@ -198,6 +252,29 @@ const supabaseClient = supabase.createClient(
   "https://sogyxzqvbquwrqlqpdaj.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZ3l4enF2YnF1d3JxbHFwZGFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1OTI0MjcsImV4cCI6MjA5NDE2ODQyN30.kubX_vDW8CiHJR7HLXs7-5RpeNI6DBlJLgt4uEhBEFE"
 );
+
+/* =========================
+SHOW TOAST
+========================= */
+
+function showToast(message, type = "success"){
+
+  const toast = document.getElementById("toast");
+
+  toast.className = "toast show " + type;
+
+  if(type === "success"){
+    toast.innerHTML =
+    `<i class="fa-solid fa-circle-check"></i> ${message}`;
+  }else{
+    toast.innerHTML =
+    `<i class="fa-solid fa-circle-xmark"></i> ${message}`;
+  }
+
+  setTimeout(()=>{
+    toast.classList.remove("show");
+  },2500);
+}
 
 /* FETCH PRODUCTS */
 async function loadProducts(){
@@ -240,9 +317,11 @@ async function loadProducts(){
 }
 
 /* DELETE PRODUCT */
+/* DELETE PRODUCT */
 async function deleteProduct(id){
 
   const confirmDelete = confirm("Delete this product?");
+  
   if(!confirmDelete) return;
 
   const { error } = await supabaseClient
@@ -251,9 +330,11 @@ async function deleteProduct(id){
     .eq("id", id);
 
   if(error){
-    alert("Delete failed!");
+    showToast("Delete Failed!","error");
     return;
   }
+
+  showToast("Product Deleted Successfully","success");
 
   loadProducts();
 }
