@@ -99,11 +99,68 @@ img.preview{
   border-radius:14px;
   margin-bottom:10px;
 }
+/* =========================
+TOAST NOTIFICATION
+========================= */
+
+.toast{
+  position:fixed;
+  top:-120px;
+  left:50%;
+  transform:translateX(-50%);
+
+  min-width:280px;
+  max-width:90%;
+
+  padding:14px 18px;
+
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  font-size:14px;
+  font-weight:600;
+
+  backdrop-filter:blur(14px);
+
+  z-index:99999;
+
+  transition:0.4s ease;
+
+  box-shadow:0 15px 40px rgba(0,0,0,0.35);
+}
+
+.toast i{
+  font-size:18px;
+}
+
+/* SHOW */
+.toast.show{
+  top:20px;
+}
+
+/* SUCCESS */
+.toast.success{
+  background:rgba(0,255,120,0.15);
+  border:1px solid rgba(0,255,120,0.25);
+  color:#8dffb5;
+}
+
+/* ERROR */
+.toast.error{
+  background:rgba(255,0,0,0.15);
+  border:1px solid rgba(255,0,0,0.25);
+  color:#ffb1b1;
+}
+
 </style>
 </head>
 
 <body>
-
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
 <header class="dashboard-header">
   <h3>EDIT PRODUCTS</h3>
 </header>
@@ -217,7 +274,7 @@ image.onchange = (e)=>{
 async function updateProduct(){
 
   if(!selectedId){
-    alert("Select product first");
+    showToast("Select product first","error");
     return;
   }
 
@@ -234,7 +291,7 @@ async function updateProduct(){
 
     if(uploadError){
       console.log(uploadError);
-      alert("Image upload failed");
+      showToast("Image upload failed","error");
       return;
     }
 
@@ -262,11 +319,11 @@ async function updateProduct(){
 
   if(error){
     console.log(error);
-    alert("Update Failed");
+   showToast("Update Failed","error");
     return;
   }
 
-  alert("Product Updated Successfully");
+  showToast("Product Updated Successfully","success");
   loadProducts();
 }
 
