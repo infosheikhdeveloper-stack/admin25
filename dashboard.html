@@ -466,6 +466,16 @@ INSTALL POPUP 3D (ADMIN)
   background:rgba(255,255,255,0.08);
   color:#fff;
 }
+#shopToggleBtn{
+  padding:14px 20px;
+  border:none;
+  border-radius:18px;
+  background:linear-gradient(135deg,#ff8c00,#ff6200);
+  color:#fff;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
 
 </style>
 </head>
@@ -517,6 +527,9 @@ WITH THIS
 ========================= -->
 
 <section class="stats-grid">
+  <button id="shopToggleBtn">
+  Loading...
+</button>
 
   <a href="users.html" class="stat-card" style="text-decoration:none;color:#fff;">
 
@@ -807,6 +820,138 @@ async function loadDashboardData(){
 }
 
 loadDashboardData();
+async function loadShopStatus(){
+
+  const btn =
+  document.getElementById("shopToggleBtn");
+
+  btn.innerText = "Loading...";
+
+  try{
+
+    const { data, error } = await supabaseClient
+      .from("shop_status")
+      .select("*")
+      .eq("id", 1)
+      .maybeSingle();
+
+    console.log(data, error);
+
+    // IF NO ROW FOUND
+    if(!data){
+
+      btn.innerHTML = "⚠️ NO STATUS";
+
+      btn.style.background =
+      "linear-gradient(135deg,#777,#444)";
+
+      return;
+    }
+
+    // SHOP OPEN
+    if(data.status === "open"){
+
+      btn.innerHTML = "🟢 SHOP OPEN";
+
+      btn.style.background =
+      "linear-gradient(135deg,#00c853,#009624)";
+    }
+
+    // SHOP CLOSED
+    else{
+
+      btn.innerHTML = "🔴 SHOP CLOSED";
+
+      btn.style.background =
+      "linear-gradient(135deg,#ff3b30,#d50000)";
+    }
+
+  }
+
+  catch(err){
+
+    console.log(err);
+
+    btn.innerText = "FAILED";
+  }
+
+}
+
+/* =========================
+LOAD FIRST TIME
+========================= */
+
+loadShopStatus();
+
+/* =========================
+TOGGLE BUTTON
+========================= */
+
+document
+.getElementById("shopToggleBtn")
+.addEventListener("click", async ()=>{
+
+  const btn =
+  document.getElementById("shopToggleBtn");
+
+  btn.innerText = "Please Wait...";
+
+  try{
+
+    // GET CURRENT STATUS
+    const { data, error } =
+    await supabaseClient
+      .from("shop_status")
+      .select("*")
+      .eq("id",1)
+      .single();
+
+    if(error){
+
+      console.log(error);
+
+      btn.innerText = "ERROR";
+
+      return;
+    }
+
+    // TOGGLE STATUS
+    let newStatus =
+    data.status === "open"
+    ? "closed"
+    : "open";
+
+    // UPDATE DATABASE
+    const { error:updateError } =
+    await supabaseClient
+      .from("shop_status")
+      .update({
+        status:newStatus
+      })
+      .eq("id",1);
+
+    if(updateError){
+
+      console.log(updateError);
+
+      btn.innerText = "UPDATE FAILED";
+
+      return;
+    }
+
+    // RELOAD BUTTON
+    loadShopStatus();
+
+  }
+
+  catch(err){
+
+    console.log(err);
+
+    btn.innerText = "FAILED";
+  }
+
+});
 
 </script>
 <script src="adminback.js"></script>
